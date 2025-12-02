@@ -34,6 +34,11 @@ Implementação do padrão **Builder** aplicada a um sistema de construção de 
 - Interface fluente que facilita a leitura e compreensão do código
 - Flexibilidade na definição de todas as características da bebida
 
+Também há uma interface web de demonstração interativa incluída: [Interface de Demonstração](https://camposcodes.github.io/PadroesCriacionais-Builder/)
+<p align="center">
+	<img src="./screenshot.png" alt="Captura da interface - Demonstração Builder" width="900" />
+</p>
+
 ## 📐 Diagrama de Classe <a name="diagrama"></a>
 O diagrama abaixo representa a arquitetura do projeto, enfatizando o padrão **Builder** como construtor de objetos complexos:
 
@@ -75,22 +80,6 @@ O diagrama abaixo representa a arquitetura do projeto, enfatizando o padrão **B
 
 ## 📊 Exemplo de Uso <a name="exemplo"></a>
 ```java
-// Construindo uma bebida quente simples
-Bebida cafe = new BebidaBuilder()
-    .setNome("Café Expresso")
-    .setTamanho("P")
-    .setPreco(5.50)
-    .setTipo("Quente")
-    .setTemperatura("Quente")
-    .setCalorias(50)
-    .setDescricao("Expresso puro e aromático")
-    .setContemCafeina(true)
-    .setContemAcucar(false)
-    .setContemLeite(false)
-    .setContemChantilly(false)
-    .build();
-
-// Construindo uma bebida fria com múltiplos toppings
 Bebida cappuccinoGelado = new BebidaBuilder()
     .setNome("Cappuccino Gelado")
     .setTamanho("M")
@@ -104,43 +93,16 @@ Bebida cappuccinoGelado = new BebidaBuilder()
     .setContemLeite(true)
     .setContemChantilly(true)
     .build();
+```
 
-// Construindo um suco natural
-Bebida sucoNatural = new BebidaBuilder()
-    .setNome("Suco de Laranja")
-    .setTamanho("G")
-    .setPreco(8.50)
-    .setTipo("Fria")
-    .setTemperatura("Gelado")
-    .setCalorias(95)
-    .setDescricao("Suco natural de laranja fresca")
-    .setContemCafeina(false)
-    .setContemAcucar(false)
-    .setContemLeite(false)
-    .setContemChantilly(false)
-    .build();
 **Saída esperada:**
 ```
-Bebida: Café Expresso
-Tamanho: P | Preço: R$ 5.50
-Tipo: Quente | Temperatura: Quente
-Calorias: 50 | Descrição: Expresso puro e aromático
-Contém Cafeína: Sim | Contém Açúcar: Não
-Contém Leite: Não | Contém Chantilly: Não
-
 Bebida: Cappuccino Gelado
 Tamanho: M | Preço: R$ 12.90
 Tipo: Gelada | Temperatura: Frio
 Calorias: 180 | Descrição: Capuccino cremoso com gelo
 Contém Cafeína: Sim | Contém Açúcar: Sim
 Contém Leite: Sim | Contém Chantilly: Sim
-
-Bebida: Suco de Laranja
-Tamanho: G | Preço: R$ 8.50
-Tipo: Fria | Temperatura: Gelado
-Calorias: 95 | Descrição: Suco natural de laranja fresca
-Contém Cafeína: Não | Contém Açúcar: Não
-Contém Leite: Não | Contém Chantilly: Não
 ```
 
 ## 🧪 Como Executar e Testes <a name="testes"></a>
