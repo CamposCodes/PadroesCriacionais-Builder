@@ -67,7 +67,7 @@ O diagrama abaixo representa a arquitetura do projeto, enfatizando o padrão **B
 - ✅ Cobertura completa de testes com JUnit 5
 - ✅ Tratamento de exceções para construção inválida
 
-##  Tecnologias <a name="tecnologias"></a>
+## 🛠️ Tecnologias <a name="tecnologias"></a>
 - **Java 11+**
 - **JUnit 5** - Framework de testes
 - **Maven** - Gerenciamento de dependências
@@ -119,8 +119,6 @@ Bebida sucoNatural = new BebidaBuilder()
     .setContemLeite(false)
     .setContemChantilly(false)
     .build();
-```
-
 **Saída esperada:**
 ```
 Bebida: Café Expresso
