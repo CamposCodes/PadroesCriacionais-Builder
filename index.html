@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Padrão Builder - Sistema Cafeteria</title>
+    <style>
+        :root {
+            --bg: #f6f8fa;
+            --surface: #ffffff;
+            --muted: #6a737d;
+            --border: #e1e4e8;
+            --accent: #0366d6;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #d73a49;
+            --shadow: 0 1px 2px rgba(27, 31, 35, 0.04), 0 8px 24px rgba(27, 31, 35, 0.08);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: var(--bg);
+            color: #24292e;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin: 0 0 24px 0;
+            color: #0b2d4a;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin: 0 0 14px 0;
+            color: #24292e;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin: 0 0 12px 0;
+            color: #24292e;
+        }
+
+        h4 {
+            font-size: 0.95rem;
+            margin: 0 0 8px 0;
+            color: #24292e;
+        }
+
+        p {
+            margin: 0 0 12px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            margin-bottom: 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            padding: 12px;
+            background: #f6f8fa;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #24292e;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .builder-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #24292e;
+        }
+
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: var(--surface);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .validation-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .validation-box.success {
+            background: #d4edda;
+            border-color: var(--success);
+        }
+
+        .validation-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+            font-size: 0.85rem;
+        }
+
+        .validation-item::before {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .validation-item.invalid::before {
+            content: "✗";
+            background: var(--danger);
+            color: white;
+        }
+
+        .validation-item.valid::before {
+            content: "✓";
+            background: var(--success);
+            color: white;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        button:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.2);
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: white;
+            border-color: transparent;
+        }
+
+        button.secondary {
+            background: var(--success);
+            color: white;
+            border-color: transparent;
+        }
+
+        button.clear {
+            background: var(--muted);
+            color: white;
+            border-color: transparent;
+        }
+
+        .preview-box {
+            background: linear-gradient(180deg, #f0f9ff, #e0f2fe);
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .preview-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .preview-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #0b2d4a;
+            margin-bottom: 8px;
+        }
+
+        .preview-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .detail-item {
+            padding: 6px;
+            background: #f6f8fa;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .detail-label {
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .beverages-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .beverage-mini {
+            background: linear-gradient(180deg, #f0f9ff, #e0f2fe);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .beverage-mini .icon {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .beverage-mini .name {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .beverage-mini .details {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .approach {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .approach-title {
+            font-weight: 700;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .approach.bad .approach-title {
+            background: var(--danger);
+        }
+
+        .approach.good .approach-title {
+            background: var(--success);
+        }
+
+        .code-block {
+            background: #f6f8fa;
+            border-left: 3px solid var(--border);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            overflow-x: auto;
+        }
+
+        .approach.bad .code-block {
+            border-left-color: var(--danger);
+            background: #ffe5e5;
+        }
+
+        .approach.good .code-block {
+            border-left-color: var(--success);
+            background: #e5f5e5;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .metric {
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .metric.bad {
+            background: #ffe5e5;
+            border: 1px solid var(--danger);
+        }
+
+        .metric.good {
+            background: #e5f5e5;
+            border: 1px solid var(--success);
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .metric.bad .metric-value {
+            color: var(--danger);
+        }
+
+        .metric.good .metric-value {
+            color: var(--success);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .result-box {
+            background: linear-gradient(180deg, #fff9e6, #ffe6cc);
+            border: 2px dashed #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .result-box h4 {
+            color: #d97706;
+            margin: 0 0 8px 0;
+        }
+
+        .result-box p {
+            color: #b45309;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .concept {
+            padding: 12px;
+            background: #f6f8fa;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .concept strong {
+            display: block;
+            color: #0b2d4a;
+            margin-bottom: 4px;
+        }
+
+        .concept p {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .concept ul {
+            margin: 4px 0 0 16px;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        .concept li {
+            margin: 2px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .empty-state-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .expandable-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0;
+            margin: 0 0 14px 0;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .expandable-header h2 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .expandable-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            transition: transform 0.3s ease;
+        }
+
+        .expandable-header.collapsed .expandable-icon {
+            transform: rotate(-90deg);
+        }
+
+        .expandable-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .expandable-header.collapsed ~ .expandable-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .builder-section {
+            background: linear-gradient(180deg, #f8fafb, #ffffff);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .builder-section-title {
+            font-weight: 600;
+            color: #0b2d4a;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .builder-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .builder-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .builder-row:last-child {
+            margin-bottom: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--muted);
+        }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 12px auto;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .builder-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: 1;
+            }
+
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .beverages-list {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .control-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>☕ Padrão Builder - Sistema Cafeteria</h1>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="buildersCreated">0</div>
+                    <div class="stat-label">Builders Usados</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="beveragesCreated">0</div>
+                    <div class="stat-label">Bebidas Criadas</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="validBeverages">0</div>
+                    <div class="stat-label">Bebidas Válidas</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">✓</div>
+                    <div class="stat-label">Fluent API</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid: Builder + Comparação -->
+        <div class="main-grid">
+            <!-- Builder Controls -->
+            <div class="card">
+                <div class="section-title">🔨 Construtor de Bebidas</div>
+                
+                <!-- Campos Obrigatórios -->
+                <div class="builder-section">
+                    <div class="builder-section-title">⭐ Campos Obrigatórios</div>
+                    <div class="builder-row">
+                        <div class="form-group">
+                            <label class="form-label">Nome *</label>
+                            <input type="text" id="nome" placeholder="Ex: Cappuccino" maxlength="30" oninput="updateValidation()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tamanho *</label>
+                            <select id="tamanho" onchange="updateValidation()">
+                                <option value="">-- Selecione --</option>
+                                <option value="Pequeno">Pequeno (250ml)</option>
+                                <option value="Médio">Médio (350ml)</option>
+                                <option value="Grande">Grande (500ml)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="builder-row">
+                        <div class="form-group">
+                            <label class="form-label">Preço (R$) *</label>
+                            <input type="number" id="preco" placeholder="Ex: 8.50" min="0.50" step="0.50" oninput="updateValidation()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipo *</label>
+                            <select id="tipo" onchange="updateValidation()">
+                                <option value="">-- Selecione --</option>
+                                <option value="Café">☕ Café</option>
+                                <option value="Chá">🍵 Chá</option>
+                                <option value="Suco">🧃 Suco</option>
+                                <option value="Refrigerante">🥤 Refrigerante</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos Opcionais -->
+                <div class="builder-section">
+                    <div class="builder-section-title">✨ Campos Opcionais</div>
+                    <div class="builder-row">
+                        <div class="form-group">
+                            <label class="form-label">Temperatura</label>
+                            <select id="temperatura" onchange="updatePreview()">
+                                <option value="">-- Selecione --</option>
+                                <option value="Quente">🔥 Quente</option>
+                                <option value="Morno">😊 Morno</option>
+                                <option value="Gelado">❄️ Gelado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Calorias</label>
+                            <input type="number" id="calorias" placeholder="Ex: 180" min="0" max="500" oninput="updatePreview()">
+                        </div>
+                    </div>
+                    <div class="builder-row full">
+                        <div class="form-group">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" id="descricao" placeholder="Ex: Espresso com leite vaporizado" oninput="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adicionais -->
+                <div class="builder-section">
+                    <div class="builder-section-title">🧂 Adicionais</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cafeina" onchange="updatePreview()">
+                            <label for="cafeina">Cafeína ⚡</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="acucar" onchange="updatePreview()">
+                            <label for="acucar">Açúcar 🍬</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="leite" onchange="updatePreview()">
+                            <label for="leite">Leite 🥛</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chantilly" onchange="updatePreview()">
+                            <label for="chantilly">Chantilly 🍨</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validação -->
+                <div class="validation-box" id="validationBox">
+                    <div class="validation-item invalid" id="val-nome">Nome inválido</div>
+                    <div class="validation-item invalid" id="val-tamanho">Tamanho não selecionado</div>
+                    <div class="validation-item invalid" id="val-preco">Preço inválido</div>
+                    <div class="validation-item invalid" id="val-tipo">Tipo não selecionado</div>
+                </div>
+
+                <!-- Ações -->
+                <div class="control-group">
+                    <button class="primary" onclick="buildBeverage()">✅ Build()</button>
+                    <button class="secondary" onclick="buildRandom()">🎲 Aleatório</button>
+                    <button class="clear" onclick="clearBuilder()">🗑️ Limpar</button>
+                </div>
+            </div>
+
+            <!-- Comparison + Preview -->
+            <div class="card">
+                <div class="section-title">👁️ Preview</div>
+                <div class="preview-box" id="preview">
+                    <div class="preview-icon" id="previewIcon">☕</div>
+                    <div class="preview-name" id="previewName">Sua bebida</div>
+                    <div class="preview-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Tamanho</div>
+                            <div class="detail-value" id="previewTamanho">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Preço</div>
+                            <div class="detail-value" id="previewPreco">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Tipo</div>
+                            <div class="detail-value" id="previewTipo">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Temp</div>
+                            <div class="detail-value" id="previewTemperatura">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">⚙️ Comparação</div>
+                <div class="comparison-grid">
+                    <div class="approach bad">
+                        <div class="approach-title">❌ SEM Builder</div>
+                        <div class="code-block">
+new Bebida(
+  "Cappuccino",
+  "Grande",
+  8.50,
+  "Café",
+  ...
+)
+                        </div>
+                        <div class="metrics-grid">
+                            <div class="metric bad">
+                                <div class="metric-label">Legibilidade</div>
+                                <div class="metric-value">❌</div>
+                            </div>
+                            <div class="metric bad">
+                                <div class="metric-label">Segurança</div>
+                                <div class="metric-value">❌</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="approach good">
+                        <div class="approach-title">✅ COM Builder</div>
+                        <div class="code-block">
+new BebidaBuilder()
+  .setNome("Cappuccino")
+  .setTamanho("Grande")
+  .setPreco(8.50)
+  .build()
+                        </div>
+                        <div class="metrics-grid">
+                            <div class="metric good">
+                                <div class="metric-label">Legibilidade</div>
+                                <div class="metric-value">✅</div>
+                            </div>
+                            <div class="metric good">
+                                <div class="metric-label">Segurança</div>
+                                <div class="metric-value">✅</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <h4>🎯 Resultado</h4>
+                    <p>Código legível + Validação automática + Interface fluente + Flexibilidade</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Sections -->
+        <div class="two-column">
+            <!-- Bebidas Criadas -->
+            <div class="card">
+                <h2>☕ Bebidas Criadas (<span id="beverageCount">0</span>)</h2>
+                <div class="beverages-list" id="beveragesList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Nenhuma bebida criada</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vantagens -->
+            <div class="card">
+                <button class="expandable-header" onclick="toggleExpandable(this)">
+                    <h2>⭐ Vantagens do Builder <span class="expandable-icon">▼</span></h2>
+                </button>
+                <div class="expandable-content">
+                    <div class="concept-grid">
+                        <div class="concept">
+                            <strong>📖 Legibilidade</strong>
+                            <p>Código auto-explicativo e fácil de entender</p>
+                        </div>
+                        <div class="concept">
+                            <strong>🛡️ Segurança</strong>
+                            <p>Validações garantem objetos válidos</p>
+                        </div>
+                        <div class="concept">
+                            <strong>🔄 Flexibilidade</strong>
+                            <p>Configure em qualquer ordem</p>
+                        </div>
+                        <div class="concept">
+                            <strong>🧩 Manutenção</strong>
+                            <p>Adicione novos campos facilmente</p>
+                        </div>
+                        <div class="concept">
+                            <strong>⚡ Sem Construtores</strong>
+                            <p>Evita múltiplas sobrecargas</p>
+                        </div>
+                        <div class="concept">
+                            <strong>📊 Escalabilidade</strong>
+                            <p>Suporta qualquer complexidade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explicação -->
+        <div class="card">
+            <button class="expandable-header" onclick="toggleExpandable(this)">
+                <h2>🎓 Como Funciona <span class="expandable-icon">▼</span></h2>
+            </button>
+            <div class="expandable-content">
+                <div class="concept-grid">
+                    <div class="concept">
+                        <strong>O Padrão</strong>
+                        <p>Separa construção de objeto complexo de sua representação final</p>
+                    </div>
+                    <div class="concept">
+                        <strong>Fluent Interface</strong>
+                        <p>Cada método retorna this para encadeamento</p>
+                    </div>
+                    <div class="concept">
+                        <strong>Validação</strong>
+                        <p>Método build() valida antes de retornar</p>
+                    </div>
+                    <div class="concept">
+                        <strong>Campos Obrigatórios</strong>
+                        <p>Nome, Tamanho, Preço e Tipo são essenciais</p>
+                    </div>
+                    <div class="concept">
+                        <strong>Campos Opcionais</strong>
+                        <p>Temperatura, Calorias e Adicionais são flexíveis</p>
+                    </div>
+                    <div class="concept">
+                        <strong>Resultado</strong>
+                        <p>Objeto Bebida seguro, validado e consistente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let beverages = [];
+        let buildersUsed = 0;
+
+        const typeIcons = {
+            'Café': '☕',
+            'Chá': '🍵',
+            'Suco': '🧃',
+            'Refrigerante': '🥤'
+        };
+
+        class BebidaBuilder {
+            constructor() {
+                this.data = {
+                    nome: '',
+                    tamanho: '',
+                    preco: null,
+                    tipo: '',
+                    temperatura: '',
+                    calorias: 0,
+                    descricao: '',
+                    cafeina: false,
+                    acucar: false,
+                    leite: false,
+                    chantilly: false
+                };
+            }
+
+            setNome(nome) {
+                this.data.nome = nome;
+                return this;
+            }
+
+            setTamanho(tamanho) {
+                this.data.tamanho = tamanho;
+                return this;
+            }
+
+            setPreco(preco) {
+                this.data.preco = preco;
+                return this;
+            }
+
+            setTipo(tipo) {
+                this.data.tipo = tipo;
+                return this;
+            }
+
+            setTemperatura(temperatura) {
+                this.data.temperatura = temperatura;
+                return this;
+            }
+
+            setCalorias(calorias) {
+                this.data.calorias = calorias;
+                return this;
+            }
+
+            setDescricao(descricao) {
+                this.data.descricao = descricao;
+                return this;
+            }
+
+            setContemCafeina(cafeina) {
+                this.data.cafeina = cafeina;
+                return this;
+            }
+
+            setContemAcucar(acucar) {
+                this.data.acucar = acucar;
+                return this;
+            }
+
+            setContemLeite(leite) {
+                this.data.leite = leite;
+                return this;
+            }
+
+            setContemChantilly(chantilly) {
+                this.data.chantilly = chantilly;
+                return this;
+            }
+
+            build() {
+                if (!this.data.nome || this.data.nome.trim() === '') {
+                    throw new Error('Nome da bebida inválido');
+                }
+                if (!this.data.tamanho) {
+                    throw new Error('Tamanho da bebida inválido');
+                }
+                if (!this.data.preco || this.data.preco <= 0) {
+                    throw new Error('Preço inválido');
+                }
+                if (!this.data.tipo) {
+                    throw new Error('Tipo da bebida inválido');
+                }
+
+                return {
+                    ...this.data,
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleTimeString('pt-BR')
+                };
+            }
+        }
+
+        function updateValidation() {
+            const nome = document.getElementById('nome').value.trim();
+            const tamanho = document.getElementById('tamanho').value;
+            const preco = parseFloat(document.getElementById('preco').value);
+            const tipo = document.getElementById('tipo').value;
+
+            const validacoes = {
+                'val-nome': nome !== '',
+                'val-tamanho': tamanho !== '',
+                'val-preco': preco > 0,
+                'val-tipo': tipo !== ''
+            };
+
+            Object.entries(validacoes).forEach(([id, isValid]) => {
+                const el = document.getElementById(id);
+                el.classList.toggle('valid', isValid);
+                el.classList.toggle('invalid', !isValid);
+            });
+
+            const allValid = Object.values(validacoes).every(v => v);
+            document.getElementById('validationBox').classList.toggle('success', allValid);
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const nome = document.getElementById('nome').value.trim() || 'Sua bebida';
+            const tamanho = document.getElementById('tamanho').value || '-';
+            const preco = document.getElementById('preco').value || '-';
+            const tipo = document.getElementById('tipo').value || '-';
+            const temperatura = document.getElementById('temperatura').value || '-';
+
+            const icon = typeIcons[tipo] || '☕';
+
+            document.getElementById('previewIcon').textContent = icon;
+            document.getElementById('previewName').textContent = nome;
+            document.getElementById('previewTamanho').textContent = tamanho;
+            document.getElementById('previewPreco').textContent = preco !== '-' ? `R$ ${parseFloat(preco).toFixed(2)}` : '-';
+            document.getElementById('previewTipo').textContent = tipo;
+            document.getElementById('previewTemperatura').textContent = temperatura;
+        }
+
+        function buildBeverage() {
+            try {
+                updateValidation();
+
+                const builder = new BebidaBuilder();
+                builder
+                    .setNome(document.getElementById('nome').value.trim())
+                    .setTamanho(document.getElementById('tamanho').value)
+                    .setPreco(parseFloat(document.getElementById('preco').value))
+                    .setTipo(document.getElementById('tipo').value)
+                    .setTemperatura(document.getElementById('temperatura').value || 'Sem preferência')
+                    .setCalorias(parseInt(document.getElementById('calorias').value) || 0)
+                    .setDescricao(document.getElementById('descricao').value)
+                    .setContemCafeina(document.getElementById('cafeina').checked)
+                    .setContemAcucar(document.getElementById('acucar').checked)
+                    .setContemLeite(document.getElementById('leite').checked)
+                    .setContemChantilly(document.getElementById('chantilly').checked);
+
+                const beverage = builder.build();
+                beverages.unshift(beverage);
+                buildersUsed++;
+
+                updateMetrics();
+                renderBeverages();
+                clearBuilder();
+            } catch (error) {
+                alert('❌ Erro: ' + error.message);
+            }
+        }
+
+        function buildRandom() {
+            const templates = [
+                { nome: 'Cappuccino', tamanho: 'Grande', preco: 8.50, tipo: 'Café', temperatura: 'Quente', calorias: 180, leite: true, cafeina: true, chantilly: true },
+                { nome: 'Espresso Duplo', tamanho: 'Pequeno', preco: 5.50, tipo: 'Café', temperatura: 'Quente', calorias: 10, cafeina: true },
+                { nome: 'Chá Verde Gelado', tamanho: 'Grande', preco: 6.00, tipo: 'Chá', temperatura: 'Gelado', calorias: 25, cafeina: true },
+                { nome: 'Suco de Morango', tamanho: 'Médio', preco: 7.50, tipo: 'Suco', temperatura: 'Gelado', calorias: 120 },
+                { nome: 'Latte com Canela', tamanho: 'Médio', preco: 8.00, tipo: 'Café', temperatura: 'Quente', calorias: 160, leite: true, cafeina: true },
+                { nome: 'Refrigerante', tamanho: 'Grande', preco: 5.00, tipo: 'Refrigerante', temperatura: 'Gelado', calorias: 150, acucar: true }
+            ];
+
+            const template = templates[Math.floor(Math.random() * templates.length)];
+
+            const builder = new BebidaBuilder();
+            builder
+                .setNome(template.nome)
+                .setTamanho(template.tamanho)
+                .setPreco(template.preco)
+                .setTipo(template.tipo)
+                .setTemperatura(template.temperatura)
+                .setCalorias(template.calorias)
+                .setContemCafeina(template.cafeina || false)
+                .setContemAcucar(template.acucar || false)
+                .setContemLeite(template.leite || false)
+                .setContemChantilly(template.chantilly || false);
+
+            const beverage = builder.build();
+            beverages.unshift(beverage);
+            buildersUsed++;
+
+            updateMetrics();
+            renderBeverages();
+            clearBuilder();
+        }
+
+        function clearBuilder() {
+            document.getElementById('nome').value = '';
+            document.getElementById('tamanho').value = '';
+            document.getElementById('preco').value = '';
+            document.getElementById('tipo').value = '';
+            document.getElementById('temperatura').value = '';
+            document.getElementById('calorias').value = '';
+            document.getElementById('descricao').value = '';
+            document.getElementById('cafeina').checked = false;
+            document.getElementById('acucar').checked = false;
+            document.getElementById('leite').checked = false;
+            document.getElementById('chantilly').checked = false;
+
+            updateValidation();
+        }
+
+        function renderBeverages() {
+            const list = document.getElementById('beveragesList');
+
+            if (beverages.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Nenhuma bebida criada</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = beverages.slice(0, 12).map((beverage) => {
+                const extras = [];
+                if (beverage.cafeina) extras.push('⚡');
+                if (beverage.acucar) extras.push('🍬');
+                if (beverage.leite) extras.push('🥛');
+                if (beverage.chantilly) extras.push('🍨');
+
+                return `
+                    <div class="beverage-mini">
+                        <div class="icon">${typeIcons[beverage.tipo] || '☕'}</div>
+                        <div class="name">${beverage.nome}</div>
+                        <div class="details">
+                            ${beverage.tamanho} • R$ ${beverage.preco.toFixed(2)}<br/>
+                            ${extras.join(' ')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateMetrics() {
+            document.getElementById('buildersCreated').textContent = buildersUsed;
+            document.getElementById('beveragesCreated').textContent = beverages.length;
+            document.getElementById('validBeverages').textContent = beverages.length;
+            document.getElementById('beverageCount').textContent = beverages.length;
+        }
+
+        function toggleExpandable(button) {
+            button.classList.toggle('collapsed');
+        }
+
+        updateValidation();
+    </script>
+</body>
+</html>
