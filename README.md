@@ -45,6 +45,7 @@ O diagrama abaixo representa a arquitetura do projeto, enfatizando o padrão **B
 <p align="center">
 	<img src="./Builder.png" alt="Diagrama de Classe - Prototype" width="800"/>
 </p>
+
 ## 🚀 Funcionalidades <a name="funcionalidades"></a>
 ### Sistema de Construção de Bebidas
 - **Bebida**: Classe que representa uma bebida com múltiplas propriedades
